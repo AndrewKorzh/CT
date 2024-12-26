@@ -9,7 +9,7 @@ class SimpleSubstitutionCipherRandomCoder:
             print("Unnown language")
             raise ValueError
         first_letter = languages_letters[language][0]
-        last_letter = languages_letters[language][0]
+        last_letter = languages_letters[language][1]
         self.letters = [chr(i) for i in range(ord(first_letter), ord(last_letter) + 1)]
         self.letter_dictionary = {}
         letter_set = set(self.letters)

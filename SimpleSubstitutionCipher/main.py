@@ -7,6 +7,8 @@ from SimpleSubstitutionCipherCracker import SimpleSubstitutionCipherCracker
 
 from SimpleSubstitutionCipherCracker2 import SimpleSubstitutionCipherCracker2
 
+from SimpleSubstitutionCipherCracker3 import SimpleSubstitutionCipherCracker3
+
 
 import random
 
@@ -27,7 +29,7 @@ def get_random_word(word_set):
 
 if __name__ == "__main__":
 
-    # sscrc = SimpleSubstitutionCipherRandomCoder(language="rus")
+    sscrc = SimpleSubstitutionCipherRandomCoder(language="rus")
     # sscc = SimpleSubstitutionCipherCracker(
     #     language="rus",
     #     dictionary_path="10000-russian-words.txt",
@@ -36,13 +38,23 @@ if __name__ == "__main__":
 
     # sscc.heuristic_function()
 
-    sscc2 = SimpleSubstitutionCipherCracker2(
+    sscc2 = SimpleSubstitutionCipherCracker3(
         language="rus",
         dictionary_path="10000-russian-words.txt",
-        text=none_coded["text1"],
+        text=sscrc.code_text(
+            none_coded["text1"]
+        ),  # coded_texts["text2"],  # none_coded["text1"]
     )
+
+    print(sscrc.code_text(none_coded["text1"]))
+
     print(sscc2.text)
+    print(sscc2.decode_text())
     sscc2.heuristic_function(decode=False)
+    sscc2.heuristic_function(decode=True)
+
+    # print(sscc2.decode_text())
+    # sscc2.best_seq_try(swq_amount=10000)
 
     # print(f"Исходный текст:\n{sscc2.decode_text()}")
     # sscc2.simulated_annealing(
