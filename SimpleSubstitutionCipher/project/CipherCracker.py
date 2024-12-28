@@ -54,8 +54,12 @@ class CipherCracker(TextHandler):
         open_text: str,
         coded_text: str,
         score_function_name="evaluate_trigrams",
-        eps=0.00001,
-        max_iters=10**10,
+        max_best_score_iters=500,
+        max_iters=1000,
+        max_distance_swap=3,
+        word_set=None,
+        word_impact_factor=0.5,
+        min_word_length=3,
     ):
         # Сделать нормальное переключение
         open_text_unigrams = self.get_unigrams(open_text)
@@ -75,7 +79,6 @@ class CipherCracker(TextHandler):
             raise ValueError("Wrong score_function_name")
 
         coded_text_unigrams = self.get_unigrams(coded_text)
-        # uni_mapping - всё равно что ключ
         letter_mapping = self.unigrams_to_mapping(
             coded_text_unigrams, open_text_unigrams
         )
@@ -83,20 +86,37 @@ class CipherCracker(TextHandler):
         text = self.apply_mapping(coded_text, letter_mapping)
 
         start_score = score_function(text, unigrams)
+        score = start_score
+        if word_set:
+            score += (
+                self.calculate_word_match_ratio(text, word_set, min_word_length)
+                * word_impact_factor
+            )
         best_score = start_score
-        iter_count = 0
-        for _ in range(10000):
-            iter_count += 1
-            key1, key2 = self.random_letter_mapping_swap(letter_mapping)
+        max_best_score_iters_count = 0
+        for i in range(max_iters):
+            key1, key2 = self.random_letter_mapping_swap(
+                letter_mapping, max_distance=max_distance_swap
+            )
             text = self.apply_mapping(coded_text, letter_mapping)
             score = score_function(text, unigrams)
-            print(f"{iter_count}) {"".join(list(letter_mapping.values()))} - {score}")
+            if word_set:
+                score += (
+                    self.calculate_word_match_ratio(text, word_set, min_word_length)
+                    * word_impact_factor
+                )
+            print(f"{i}) {"".join(list(letter_mapping.values()))} - {score}")
             if score > best_score:
                 best_score = score
+                max_best_score_iters_count = 0
+
             else:
+                max_best_score_iters_count += 1
                 l = letter_mapping[key1]
                 letter_mapping[key1] = letter_mapping[key2]
                 letter_mapping[key2] = l
+            if max_best_score_iters_count > max_best_score_iters:
+                break
 
         print(f"start_score - {start_score}, best_score - {best_score}")
 
@@ -108,28 +128,24 @@ if __name__ == "__main__":
     open_text = cipher_cracker.read_from_file("./texts/detstvo.txt")
 
     # text = "Привет дорогой друг! Я тебя приветствую! Бу, испугался? Не бойся, я друг, я тебя не обижу! Иди сюда, иди ко мне!"
-    text = cipher_cracker.read_from_file("./texts/my_text_coded.txt")
+    text = cipher_cracker.read_from_file("./texts/text2.txt")
+
+    cleand_text = cipher_cracker.clean_and_format_text(text)
+
+    word_set = cipher_cracker.process_file_to_set(
+        file_path="./dictionaries/10000-russian-words.txt"
+    )
 
     decoded_text = cipher_cracker.simple_chrack(
-        open_text=open_text, coded_text=text, score_function_name="evaluate_trigrams"
+        open_text=open_text,
+        coded_text=cleand_text,
+        max_iters=10000,
+        max_best_score_iters=500,
+        max_distance_swap=3,
+        score_function_name="evaluate_trigrams",
+        word_set=word_set,
+        word_impact_factor=0.5,
+        min_word_length=4,
     )
 
     print(decoded_text)
-
-    # # open_text = cipher_cracker.read_from_file("./texts/my_text_decoded.txt")
-    # open_text_unigrams = cipher_cracker.get_unigrams(open_text)
-    # open_text_bigrams = cipher_cracker.get_bigrams(open_text)
-    # open_text_trigrams = cipher_cracker.get_trigrams(open_text)
-
-    # cleand_text = cipher_cracker.clean_and_format_text(text=text)
-    # cleand_text_unigrams = cipher_cracker.get_unigrams(cleand_text)
-
-    # uni_mapping = cipher_cracker.unigrams_to_mapping(
-    #     cleand_text_unigrams, open_text_unigrams
-    # )
-
-    # print(cipher_cracker.evaluate_unigrams(cleand_text, open_text_unigrams))
-    # print(cipher_cracker.evaluate_bigrams(cleand_text, open_text_bigrams))
-    # print(cipher_cracker.evaluate_trigrams(cleand_text, open_text_trigrams))
-
-    # print(cipher_cracker.apply_mapping(cleand_text, uni_mapping))

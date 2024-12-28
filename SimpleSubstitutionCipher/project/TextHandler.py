@@ -52,24 +52,24 @@ class TextHandler:
             bigrams[bigram] = bigrams.get(bigram, 0) + 1
         return bigrams
 
-    def get_trigrams(self, text: str) -> dict:
-        trigrams = {}
-        for i in range(len(text) - 2):
-            trigram = text[i : i + 3]  # Срез возвращает строку.
-            trigrams[trigram] = trigrams.get(trigram, 0) + 1
-        return trigrams
-
     # def get_trigrams(self, text: str) -> dict:
     #     trigrams = {}
-    #     text = list(text)
-
     #     for i in range(len(text) - 2):
-    #         trigram = f"{text[i]}{text[i + 1]}{text[i + 2]}"
-    #         if trigram in trigrams:
-    #             trigrams[trigram] += 1
-    #         else:
-    #             trigrams[trigram] = 1
+    #         trigram = text[i : i + 3]  # Срез возвращает строку.
+    #         trigrams[trigram] = trigrams.get(trigram, 0) + 1
     #     return trigrams
+
+    def get_trigrams(self, text: str) -> dict:
+        trigrams = {}
+        text = list(text)
+
+        for i in range(len(text) - 2):
+            trigram = f"{text[i]}{text[i + 1]}{text[i + 2]}"
+            if trigram in trigrams:
+                trigrams[trigram] += 1
+            else:
+                trigrams[trigram] = 1
+        return trigrams
 
     def cosine_similarity(self, vec1: dict, vec2: dict) -> float:
         all_keys = set(vec1.keys()).union(set(vec2.keys()))
@@ -91,6 +91,31 @@ class TextHandler:
     def evaluate_trigrams(self, text: str, trigram_stat: dict) -> float:
         trigrams = self.get_trigrams(text)
         return self.cosine_similarity(trigrams, trigram_stat)
+
+    def process_file_to_set(self, file_path: str) -> set:
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                text = file.read()
+            cleaned_text = re.sub(r"[^a-zA-Zа-яА-ЯёЁ\s]", "", text)
+            word_set = set(cleaned_text.split())
+            return word_set
+        except FileNotFoundError:
+            print(f"Файл '{file_path}' не найден.")
+            return set()
+        except Exception as e:
+            print(f"Ошибка при обработке файла: {e}")
+            return set()
+
+    def calculate_word_match_ratio(
+        self, text: str, word_set: set, min_word_length: int = 2
+    ) -> float:
+        words_in_text = set(
+            word for word in text.split() if len(word) >= min_word_length
+        )
+        matching_words = words_in_text.intersection(word_set)
+        if len(words_in_text) == 0:
+            return 0.0
+        return len(matching_words) / len(words_in_text)
 
 
 if __name__ == "__main__":
