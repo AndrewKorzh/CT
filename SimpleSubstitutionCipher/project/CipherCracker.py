@@ -120,7 +120,7 @@ class CipherCracker(TextHandler):
 
         print(f"start_score - {start_score}, best_score - {best_score}")
 
-        return cipher_cracker.apply_mapping(coded_text, letter_mapping)
+        return self.apply_mapping(coded_text, letter_mapping)
 
 
 if __name__ == "__main__":
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         max_iters=10000,
         max_best_score_iters=500,
         max_distance_swap=3,
-        score_function_name="evaluate_trigrams",
+        score_function_name="evaluate_bigrams",
         word_set=word_set,
         word_impact_factor=0.5,
         min_word_length=4,
