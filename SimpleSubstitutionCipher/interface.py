@@ -1,9 +1,9 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from TextHandler import TextHandler
-from CipherCracker import CipherCracker
 import math
-import string
+import tkinter as tk
+from tkinter import filedialog
+
+from CipherCracker import CipherCracker
+
 
 DEFAULT_PADX = 5
 DEFAULT_PADY = 2

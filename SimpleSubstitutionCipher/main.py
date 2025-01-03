@@ -1,13 +1,11 @@
-from TextHandler import TextHandler
+import tkinter as tk
+
+from CipherCracker import CipherCracker
+from interface import CipherCrackerInterface
+
 
 if __name__ == "__main__":
-    th = TextHandler()
-    word_set = th.process_file_to_set(
-        file_path="./dictionaries/10000-russian-words.txt"
-    )
-
-    print(
-        th.calculate_word_match_ratio(
-            "привет дорогой друг как твои дела ы в ы", word_set
-        )
-    )
+    root = tk.Tk()
+    cipher_cracker = CipherCracker()
+    cipher_cracker_interface = CipherCrackerInterface(root, cipher_cracker)
+    root.mainloop()

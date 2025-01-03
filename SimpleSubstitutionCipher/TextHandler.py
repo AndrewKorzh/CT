@@ -1,5 +1,5 @@
-import math
 import re
+import math
 
 
 class TextHandler:
