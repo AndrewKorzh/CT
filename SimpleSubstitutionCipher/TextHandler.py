@@ -125,8 +125,7 @@ if __name__ == "__main__":
     open_text_bigrams = text_handler.get_bigrams(open_text)
     open_text_trigrams = text_handler.get_trigrams(open_text)
 
-    # text = "Привет! Меня зовут андрей) Как твои дела?"
-    text = "Привет. Я даже и не знаю как мне вас благодарить... Не от безысходности своей я прошу помочь мне, но от моего Великого сожаления о содеянном!"
+    text = "Привет!"
     text = text_handler.read_from_file("./texts/my_text_decoded.txt")
     cleand_text = text_handler.clean_and_format_text(text=text)
 
